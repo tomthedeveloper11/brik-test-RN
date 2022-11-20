@@ -14,14 +14,11 @@ import {
   Pressable,
   TextInput,
 } from "react-native"
-import axios from "axios"
 import Ionicons from "@expo/vector-icons/Ionicons"
+import { useSelector, useDispatch } from "react-redux"
+import { fetchItems, addItem } from "../redux/actions"
 
 export default function HomeScreen({ navigation }) {
-  const limit = 20
-  const [page, setPage] = useState(0)
-  const [items, setItems] = useState([])
-  const [tempItems, setTempItems] = useState([])
   const [modalVisible, setModalVisible] = useState(false)
   const [newItem, setNewItem] = useState({
     title: "",
@@ -29,43 +26,12 @@ export default function HomeScreen({ navigation }) {
     price: "",
   })
   const [query, setQuery] = useState("")
-  const baseUrl = "https://dummyjson.com"
+
+  const dispatch = useDispatch()
+  const { items } = useSelector((state) => state.itemReducer)
 
   const onChange = (name, value) => {
     setNewItem({ ...newItem, [name]: value })
-  }
-
-  const getItems = async () => {
-    const url = `${baseUrl}/products?limit=${limit}&skip=${page}`
-    const res = await axios.get(url)
-    setPage(page + limit)
-    setItems((prevItems) => [...prevItems, ...res.data.products])
-    setTempItems((prevItems) => [...prevItems, ...res.data.products])
-    return res
-  }
-
-  const addItem = async () => {
-    console.log("kepanggil additem")
-    const url = `${baseUrl}/products/add`
-    const res = await axios.post(
-      url,
-      JSON.stringify({
-        title: newItem.title,
-        description: newItem.description,
-        price: newItem.price,
-      }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
-    console.log(res.status, "Add Item Success")
-    setNewItem({
-      title: "",
-      description: "",
-      price: "",
-    })
   }
 
   const Item = ({ item }) => (
@@ -83,15 +49,34 @@ export default function HomeScreen({ navigation }) {
   const renderItem = ({ item }) => <Item item={item} />
 
   useEffect(() => {
-    getItems()
-      .then((res) => {
-        setItems(res.data.products)
-        setTempItems(res.data.products)
-      })
-      .catch((e) => {
-        console.error(e)
-      })
+    dispatch(fetchItems())
   }, [])
+
+  function submitAddItem() {
+    dispatch(addItem(newItem))
+      .then(async (res) => {
+        const data = await res.json()
+
+        if (!res.ok) {
+          const error = (data && data.message) || res.statusText
+          return Promise.reject(error)
+        }
+        console.log("Success Add Item", res.status)
+        return data
+      })
+      .then(() => {
+        setNewItem({
+          title: "",
+          description: "",
+          price: "",
+        })
+        dispatch(fetchItems())
+        setModalVisible(!modalVisible)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -178,8 +163,7 @@ export default function HomeScreen({ navigation }) {
               <Pressable
                 style={[styles.button, styles.buttonClose]}
                 onPress={() => {
-                  addItem()
-                  setModalVisible(!modalVisible)
+                  submitAddItem()
                 }}
               >
                 <Text style={styles.textStyle}>Add Item</Text>
@@ -207,22 +191,26 @@ export default function HomeScreen({ navigation }) {
       >
         <Ionicons name="add-outline" size={38} color="green" />
       </TouchableOpacity>
-      <FlatList
-        data={items
-          .filter((item) => {
-            if (query === "") {
-              return item
-            } else if (item.title.toLowerCase().includes(query.toLowerCase())) {
-              return item
-            }
-          })
-          .map((item) => item)
-          .sort((a, b) => a.id - b.id)}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        onEndReachedThreshold={0.1}
-        onEndReached={getItems}
-      />
+      {items && (
+        <FlatList
+          data={items
+            .filter((item) => {
+              if (query === "") {
+                return item
+              } else if (
+                item.title.toLowerCase().includes(query.toLowerCase())
+              ) {
+                return item
+              }
+            })
+            .map((item) => item)
+            .sort((a, b) => a.id - b.id)}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          onEndReachedThreshold={0.1}
+          onEndReached={() => dispatch(fetchItems())}
+        />
+      )}
       <StatusBar style="auto" animated="true" />
     </SafeAreaView>
   )

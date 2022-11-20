@@ -16,10 +16,14 @@ import {
   Image,
 } from "react-native"
 import { useEffect, useState } from "react"
+import { useDispatch } from "react-redux"
+import { fetchItems, addItem, updateItem } from "../redux/actions"
 
 const baseUrl = "https://dummyjson.com"
 
 export default function DetailScreen({ route, navigation }) {
+  const dispatch = useDispatch()
+
   const { item } = route.params
 
   const [newItem, setNewItem] = useState({
@@ -27,39 +31,46 @@ export default function DetailScreen({ route, navigation }) {
     description: item.description,
     price: item.price,
   })
-  console.log(newItem)
 
   const onChange = (name, value) => {
     if (name == "price") {
-      setNewItem({ ...newItem, [name]: +value })
-    } else {
       setNewItem({ ...newItem, [name]: Number(value) })
+    } else {
+      setNewItem({ ...newItem, [name]: value })
     }
   }
 
-  const updateItem = async () => {
-    console.log("kepanggil updateItem")
-    const url = `${baseUrl}/products/${item.id}`
-    const res = await axios.put(
-      url,
-      JSON.stringify({
-        title: newItem.title,
-        description: newItem.description,
-        price: newItem.price,
-      }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
-    console.log(res.status, "Update Item Success")
+  function submitUpdateItem() {
+    dispatch(updateItem(item.id, newItem))
+      .then(async (res) => {
+        const data = await res.json()
+
+        if (!res.ok) {
+          const error = (data && data.message) || res.statusText
+          return Promise.reject(error)
+        }
+        console.log("Success Update Item", res.status)
+        return data
+      })
+      .then(() => {
+        setNewItem({
+          title: "",
+          description: "",
+          price: "",
+        })
+        navigation.goBack()
+        dispatch(fetchItems())
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
+
   return (
     <>
       <SafeAreaView>
         <Image
-          style={{ height: 300, resizeMode: "cover", }}
+          style={{ height: 300, resizeMode: "cover" }}
           source={{ uri: `${item.thumbnail}` }}
         />
         <View style={styles.form}>
@@ -79,7 +90,6 @@ export default function DetailScreen({ route, navigation }) {
             placeholder="Best Iphone Ever"
             multiline={true}
             value={newItem.description}
-            selection={{ start: 0 }}
           />
           <Text style={styles.label}>Price</Text>
 
@@ -93,8 +103,7 @@ export default function DetailScreen({ route, navigation }) {
           <Pressable
             style={[styles.button, styles.buttonClose]}
             onPress={() => {
-              updateItem()
-              navigation.goBack()
+              submitUpdateItem()
             }}
           >
             <Text style={styles.textStyle}>Update Item</Text>
@@ -113,7 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   form: {
-    margin: 16
+    margin: 16,
   },
   title: {
     fontSize: 68,
