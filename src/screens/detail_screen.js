@@ -1,25 +1,15 @@
-import { StatusBar } from "expo-status-bar"
-import axios from "axios"
-
 import {
-  Button,
-  FlatList,
   SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
-  Alert,
-  Modal,
   Pressable,
   TextInput,
   Image,
 } from "react-native"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useDispatch } from "react-redux"
-import { fetchItems, addItem, updateItem } from "../redux/actions"
-
-const baseUrl = "https://dummyjson.com"
+import { fetchItems, updateItem } from "../redux/actions"
 
 export default function DetailScreen({ route, navigation }) {
   const dispatch = useDispatch()
@@ -106,7 +96,7 @@ export default function DetailScreen({ route, navigation }) {
               submitUpdateItem()
             }}
           >
-            <Text style={styles.textStyle}>Update Item</Text>
+            <Text style={styles.buttonTextStyle}>Update Item</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -115,17 +105,8 @@ export default function DetailScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   form: {
     margin: 16,
-  },
-  title: {
-    fontSize: 68,
   },
   label: {
     fontSize: 11,
@@ -143,7 +124,7 @@ const styles = StyleSheet.create({
   buttonClose: {
     backgroundColor: "#2196F3",
   },
-  textStyle: {
+  buttonTextStyle: {
     color: "white",
     fontWeight: "bold",
     textAlign: "center",

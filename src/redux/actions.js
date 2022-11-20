@@ -41,10 +41,6 @@ export const fetchItems = () => {
       .catch((err) => {
         console.log(err)
       })
-
-    //     setPage(page + limit)
-    //     setItems((prevItems) => [...prevItems, ...res.data.products])
-    //     setTempItems((prevItems) => [...prevItems, ...res.data.products])
   }
 }
 
@@ -84,11 +80,5 @@ export const deleteItem = (id) => {
       },
       body: JSON.stringify(payload),
     })
-  }
-}
-
-export const fetchNextPage = (id) => {
-  return (dispatch, getState) => {
-    getState
   }
 }

@@ -2,14 +2,12 @@ import { useEffect, useState } from "react"
 import { StatusBar } from "expo-status-bar"
 
 import {
-  Button,
   FlatList,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Alert,
   Modal,
   Pressable,
   TextInput,
@@ -98,7 +96,7 @@ export default function HomeScreen({ navigation }) {
           <Ionicons
             name="search-outline"
             size={28}
-            color="green"
+            color="blue"
             style={{ margin: 8 }}
           />
         </View>
@@ -158,7 +156,7 @@ export default function HomeScreen({ navigation }) {
                   setModalVisible(!modalVisible)
                 }}
               >
-                <Text style={styles.textStyle}>Cancel</Text>
+                <Text style={styles.buttonTextStyle}>Cancel</Text>
               </Pressable>
               <Pressable
                 style={[styles.button, styles.buttonClose]}
@@ -166,30 +164,17 @@ export default function HomeScreen({ navigation }) {
                   submitAddItem()
                 }}
               >
-                <Text style={styles.textStyle}>Add Item</Text>
+                <Text style={styles.buttonTextStyle}>Add Item</Text>
               </Pressable>
             </View>
           </View>
         </View>
       </Modal>
       <TouchableOpacity
-        style={{
-          borderWidth: 1,
-          borderColor: "rgba(0,0,0,0.2)",
-          alignItems: "center",
-          justifyContent: "center",
-          position: "absolute",
-          bottom: 10,
-          right: 10,
-          width: 60,
-          height: 60,
-          backgroundColor: "#fff",
-          borderRadius: 100,
-          zIndex: 20,
-        }}
+        style={styles.fab}
         onPress={() => setModalVisible(true)}
       >
-        <Ionicons name="add-outline" size={38} color="green" />
+        <Ionicons name="add-outline" size={38} color="blue" />
       </TouchableOpacity>
       {items && (
         <FlatList
@@ -278,7 +263,7 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: "red",
   },
-  textStyle: {
+  buttonTextStyle: {
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
@@ -300,4 +285,18 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "700",
   },
+  fab: {
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    width: 60,
+    height: 60,
+    backgroundColor: "#fff",
+    borderRadius: 100,
+    zIndex: 20,
+  }
 })

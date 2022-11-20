@@ -6,12 +6,15 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "expo-error-log": "expo-error-log"
   },
   "dependencies": {
     "@react-navigation/native-stack": "^6.9.1",
     "axios": "^1.1.3",
     "expo": "~47.0.6",
+    "expo-constants": "~14.0.2",
+    "expo-error-log": "^1.1.3",
     "expo-status-bar": "~1.4.2",
     "react": "18.1.0",
     "react-native": "0.70.5",
